@@ -30,14 +30,16 @@ st.divider()
 # ---------- Health / connectivity ----------
 @st.cache_data(ttl=30)
 def check_backend(url: str, path: str) -> tuple[bool, str]:
+    """Ping backend health endpoint ?health=1."""
     if not url:
         return False, "No backend URL set."
     try:
-        u = url.rstrip("/") + path
+        u = url.rstrip("/") + "/?health=1"
         r = requests.get(u, timeout=5)
         if r.ok:
             return True, f"GET {u} → {r.status_code}"
-        return False, f"GET {u} → {r.status_code}"
+        else:
+            return False, f"GET {u} → {r.status_code}: {r.text[:100]}"
     except Exception as e:
         return False, f"{type(e).__name__}: {e}"
 
